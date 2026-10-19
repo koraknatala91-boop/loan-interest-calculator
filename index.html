@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Калькулятор процентов по займу</title>
+  <style>
+    :root { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; color: #17233b; background: #f3f6fb; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; }
+    .wrap { max-width: 1060px; padding: 40px 22px 62px; margin: 0 auto; }
+    .topline { color: #3566af; font-weight: 800; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { font-size: clamp(28px, 4vw, 40px); letter-spacing: -.04em; margin: 10px 0 10px; line-height: 1.15; }
+    .intro { color: #586780; line-height: 1.55; margin: 0 0 27px; max-width: 780px; }
+    .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 19px; align-items: start; }
+    .panel { background: #fff; border: 1px solid #e2e9f3; border-radius: 20px; padding: 27px; box-shadow: 0 6px 22px rgba(38,65,110,.04); }
+    .panel h2 { margin: 0 0 23px; font-size: 19px; letter-spacing: -.02em; }
+    label { display: block; color: #3b4b65; font-size: 13px; font-weight: 650; margin-bottom: 8px; }
+    .field { margin-bottom: 21px; }
+    input, select { background: #fbfcff; color: #15253f; border: 1px solid #d5dfed; border-radius: 11px; font: inherit; width: 100%; padding: 13px 14px; min-height: 46px; outline: none; transition: border-color .15s, box-shadow .15s; }
+    input:focus, select:focus { border-color: #477bd1; box-shadow: 0 0 0 3px rgba(71,123,209,.12); }
+    input[disabled] { background: #eef2f8; color: #8995aa; }
+    .smallgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .switch { display: flex; background: #f1f5fb; padding: 4px; border-radius: 12px; margin-bottom: 18px; gap: 4px; }
+    .switch button { appearance: none; border: 0; border-radius: 9px; background: transparent; color: #63728b; flex: 1; cursor: pointer; font: inherit; font-size: 13px; font-weight: 700; padding: 10px 8px; }
+    .switch button.active { background: #fff; color: #1a4fa2; box-shadow: 0 2px 7px rgba(29,70,128,.1); }
+    .hint { font-size: 12px; line-height: 1.5; color: #6b7b93; margin: 7px 0 0; }
+    .hero { background: linear-gradient(125deg,#193b7c,#2568bd); color: #fff; border-radius: 16px; padding: 24px 22px; margin: -4px 0 20px; }
+    .hero .eyebrow { font-size: 13px; opacity: .82; }
+    .hero .amount { margin: 10px 0 8px; font-size: clamp(25px, 3.5vw, 36px); font-weight: 800; letter-spacing: -.03em; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+    .hero .sub { font-size: 13px; opacity: .88; line-height: 1.5; }
+    .metriclist { border: 1px solid #e8edf6; border-radius: 14px; overflow: hidden; }
+    .metric { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 14px 16px; }
+    .metric + .metric { border-top: 1px solid #e8edf6; }
+    .metric span { color: #637188; font-size: 13px; }
+    .metric strong { text-align: right; font-size: 15px; font-variant-numeric: tabular-nums; }
+    .formula { margin-top: 19px; background: #f6f8fd; border-radius: 14px; padding: 18px; }
+    .formula h3 { margin: 0 0 8px; font-size: 14px; }
+    .formula .calc { line-height: 1.7; font-size: 14px; overflow-wrap: anywhere; color: #314d77; font-weight: 650; }
+    .formula .details { margin: 10px 0 0; line-height: 1.55; font-size: 12px; color: #63738e; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 19px; }
+    .actions button { border: 1px solid #d3e0f0; background: #fff; color: #215598; border-radius: 10px; font: inherit; cursor: pointer; padding: 11px 14px; font-size: 13px; font-weight: 700; }
+    .actions button:hover { background: #f2f7ff; }
+    .alert { color: #a33727; font-size: 13px; line-height: 1.5; min-height: 18px; }
+    .footnote { margin-top: 19px; color: #728098; font-size: 12px; line-height: 1.7; }
+    .footnote strong { color: #485b78; }
+    .hidden { display: none; }
+    @media (max-width: 760px) { .wrap { padding: 25px 14px 40px; } .grid { grid-template-columns: 1fr; } .panel { padding: 21px; } }
+    @media print { body { background: white; } .wrap { padding: 0; } .panel { box-shadow: none; } .actions, .switch { display: none; } .grid { grid-template-columns: 1fr 1fr; } .hero { background: #f0f4fa; color: #17233b; border: 1px solid #c9d6e8; } }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="topline">Финансовые расчёты · Локальный файл</div>
+    <h1>Калькулятор процентов по займу</h1>
+    <p class="intro">Рассчитайте проценты по сумме займа, годовой ставке и фактическому сроку. Работает прямо на компьютере, без интернета и передачи данных.</p>
+    <div class="grid">
+      <section class="panel" aria-label="Параметры займа">
+        <h2>Параметры расчёта</h2>
+        <div class="field">
+          <label for="principal">Сумма займа, ₽</label>
+          <input type="text" id="principal" inputmode="decimal" value="100 000 000" autocomplete="off">
+        </div>
+        <div class="smallgrid">
+          <div class="field">
+            <label for="rate">Ставка, % годовых</label>
+            <input type="text" id="rate" inputmode="decimal" value="19" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="basis">Дней в расчётном году</label>
+            <select id="basis"><option value="365" selected>365</option><option value="366">366</option><option value="360">360</option></select>
+          </div>
+        </div>
+        <label>Срок начисления процентов</label>
+        <div class="switch" role="group" aria-label="Способ определения срока">
+          <button type="button" id="daysBtn" class="active" aria-pressed="true">Количество дней</button>
+          <button type="button" id="datesBtn" aria-pressed="false">По датам</button>
+        </div>
+        <div id="daysFields" class="field">
+          <label for="days">Количество дней</label>
+          <input type="number" id="days" value="30" min="0" max="100000" step="1">
+          <p class="hint">Например, для 30 календарных дней введите 30.</p>
+        </div>
+        <div id="datesFields" class="hidden">
+          <div class="smallgrid">
+            <div class="field"><label for="startDate">Дата начала</label><input id="startDate" type="date" value="2026-10-01"></div>
+            <div class="field"><label for="endDate">Дата окончания</label><input id="endDate" type="date" value="2026-10-31"></div>
+          </div>
+          <p class="hint">Первый день исключается, последний включается. Например, с 01.10 по 31.10 = 30 дней. Условия договора могут предусматривать иной порядок.</p>
+        </div>
+        <div class="alert" id="error" role="alert" aria-live="polite"></div>
+      </section>
+      <section class="panel" aria-label="Результаты расчёта">
+        <h2>Результаты</h2>
+        <div class="hero">
+          <div class="eyebrow">Начисленные проценты за период</div>
+          <div class="amount" id="totalInterest">1 561 643,84 ₽</div>
+          <div class="sub" id="periodLabel">30 дней · ставка 19% годовых</div>
+        </div>
+        <div class="metriclist">
+          <div class="metric"><span>Проценты за 1 день</span><strong id="perDay">52 054,79 ₽</strong></div>
+          <div class="metric"><span>Проценты за 30 дней</span><strong id="per30">1 561 643,84 ₽</strong></div>
+          <div class="metric"><span>Проценты за полный расчётный год</span><strong id="perYear">19 000 000,00 ₽</strong></div>
+          <div class="metric"><span>Займ + начисленные проценты</span><strong id="due">101 561 643,84 ₽</strong></div>
+        </div>
+        <div class="formula">
+          <h3>Формула простых процентов</h3>
+          <div class="calc" id="formulaText">100 000 000 × 19% × 30 / 365 = 1 561 643,84 ₽</div>
+          <div class="details">Проценты = сумма займа × ставка / 100 × количество дней / расчётная база дней.</div>
+          <div class="details" id="excelText">Excel: =100000000*19%*30/365</div>
+        </div>
+        <div class="actions">
+          <button type="button" id="copyBtn">Скопировать расчёт</button>
+          <button type="button" id="printBtn">Распечатать / сохранить PDF</button>
+        </div>
+      </section>
+    </div>
+    <p class="footnote"><strong>Важно.</strong> Расчёт предполагает простые проценты без капитализации, дополнительных траншей, частичных погашений и изменения ставки. Выберите базу 365, 366 или 360 согласно договору. При расчёте за длительный период, затрагивающий високосные годы, фиксированная база применяется ко всем дням; для начислений по правилам с переменной базой по годам потребуется отдельный расчёт. Это финансовый калькулятор, а не автоматическое определение условий договора.</p>
+  </main>
+  <script>
+    'use strict';
+    const $ = id => document.getElementById(id);
+    const fmt = value => Number.isFinite(value) ? value.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₽' : '—';
+    const num = value => Number(String(value).replace(/[\s\u00A0\u202F]/g,'').replace(',','.'));
+    let mode = 'days';
+    let latest = null;
+    function isoDay(value) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return NaN;
+      const [y,m,d] = value.split('-').map(Number);
+      const date = new Date(0);
+      date.setUTCFullYear(y,m-1,d);
+      date.setUTCHours(0,0,0,0);
+      if (date.getUTCFullYear() !== y || date.getUTCMonth() !== m-1 || date.getUTCDate() !== d) return NaN;
+      return date.getTime()/86400000;
+    }
+    function calculate() {
+      const principal = num($('principal').value);
+      const rate = num($('rate').value);
+      const basis = Number($('basis').value);
+      const days = mode === 'days' ? Number($('days').value) : isoDay($('endDate').value)-isoDay($('startDate').value);
+      let error = '';
+      if (!$('principal').value.trim() || !Number.isFinite(principal) || principal < 0) error = 'Введите корректную сумму займа (от 0 ₽).';
+      else if (!$('rate').value.trim() || !Number.isFinite(rate) || rate < 0) error = 'Введите корректную процентную ставку (от 0%).';
+      else if ((mode === 'days' && $('days').value.trim() === '') || !Number.isSafeInteger(days) || days < 0 || days > 100000) error = 'Укажите корректный срок. Дата окончания должна быть не раньше даты начала.';
+      $('error').textContent = error;
+      if (error) {
+        latest = null;
+        for (const id of ['totalInterest','perDay','per30','perYear','due','formulaText','excelText']) $(id).textContent = '—';
+        $('periodLabel').textContent = 'Исправьте параметры расчёта';
+        return;
+      }
+      const daily = principal * rate/100/basis;
+      const interest = daily*days;
+      const annual = principal*rate/100;
+      latest = { principal, rate, basis, days, daily, interest, annual, due: principal+interest };
+      $('totalInterest').textContent = fmt(interest);
+      $('perDay').textContent = fmt(daily);
+      $('per30').textContent = fmt(daily*30);
+      $('perYear').textContent = fmt(annual);
+      $('due').textContent = fmt(principal+interest);
+      $('periodLabel').textContent = `${days.toLocaleString('ru-RU')} дн. · ставка ${rate.toLocaleString('ru-RU')}% годовых`;
+      $('formulaText').textContent = `${principal.toLocaleString('ru-RU')} × ${rate.toLocaleString('ru-RU')}% × ${days.toLocaleString('ru-RU')} / ${basis} = ${fmt(interest)}`;
+      $('excelText').textContent = `Excel: =${principal}*${String(rate).replace('.', ',')}%*${days}/${basis}`;
+    }
+    function setMode(next) {
+      mode = next;
+      $('daysFields').classList.toggle('hidden',mode !== 'days');
+      $('datesFields').classList.toggle('hidden',mode !== 'dates');
+      $('daysBtn').classList.toggle('active',mode === 'days');
+      $('datesBtn').classList.toggle('active',mode === 'dates');
+      $('daysBtn').setAttribute('aria-pressed',String(mode === 'days'));
+      $('datesBtn').setAttribute('aria-pressed',String(mode === 'dates'));
+      calculate();
+    }
+    $('daysBtn').addEventListener('click',()=>setMode('days'));
+    $('datesBtn').addEventListener('click',()=>setMode('dates'));
+    ['principal','rate','basis','days','startDate','endDate'].forEach(id => { $(id).addEventListener('input',calculate); $(id).addEventListener('change',calculate); });
+    $('printBtn').addEventListener('click',()=>window.print());
+    $('copyBtn').addEventListener('click',async()=>{
+      if (!latest) return;
+      const v = latest;
+      const content = `Калькулятор процентов по займу\nСумма займа: ${fmt(v.principal)}\nСтавка: ${v.rate}% годовых\nПериод: ${v.days} дн.\nРасчётная база: ${v.basis} дней\nПроценты: ${fmt(v.interest)}\nИтого займ + проценты: ${fmt(v.due)}\nФормула: ${v.principal} × ${v.rate}% × ${v.days} / ${v.basis}`;
+      const btn = $('copyBtn');
+      try {
+        if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(content);
+        else {
+          const text = document.createElement('textarea'); text.value=content; text.style.position='fixed'; text.style.opacity='0'; document.body.appendChild(text); text.select();
+          if(!document.execCommand('copy')) throw new Error('Не удалось скопировать');
+          text.remove();
+        }
+        btn.textContent = 'Скопировано';
+        setTimeout(()=>btn.textContent='Скопировать расчёт',1600);
+      } catch(e) { btn.textContent = 'Копирование недоступно'; setTimeout(()=>btn.textContent='Скопировать расчёт',2200); }
+    });
+    calculate();
+  </script>
+</body>
+</html>
